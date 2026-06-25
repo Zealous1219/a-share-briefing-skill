@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a-share-briefing-skill"
+version = "0.1.0"
+description = "Agent-agnostic skill for generating A-share market closing briefings via Wind MCP Skill."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Zealous1219" }]
+keywords = ["a-share", "stock", "market", "briefing", "wind", "skill", "agent"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial",
+]
+
+# 核心运行无需第三方依赖：数据通过 Wind MCP Skill 的 Node CLI 获取
+dependencies = []
+
+[project.optional-dependencies]
+# 独立模式：调用外部 LLM 生成分析时需要
+ai = ["openai>=1.30.0,<2.0.0"]
+# 开发依赖：lint / type check / test
+dev = [
+    "ruff>=0.6.0",
+    "mypy>=1.10.0",
+    "pytest>=8.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Zealous1219/a-share-briefing-skill"
+Repository = "https://github.com/Zealous1219/a-share-briefing-skill"
+Issues = "https://github.com/Zealous1219/a-share-briefing-skill/issues"
+
+[tool.setuptools]
+# 仅打包 Python 源码，排除报告输出与配置
+py-modules = ["main"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# 启用：未使用导入、未使用变量、裸 except、行过长、F 系列（pyflakes）
+select = ["E", "F", "W", "B"]
+# 允许中文标识符注释；忽略行长度告警（已 120）
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"templates/report_template.py" = ["B"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

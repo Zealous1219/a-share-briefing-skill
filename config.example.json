@@ -1,0 +1,27 @@
+{
+    "wind_api_key": "YOUR_WIND_API_KEY_HERE",
+    "wind_api_url": "https://aifinmarket.wind.com.cn/",
+    "output_dir": "./reports",
+    "index_codes": {
+        "shanghai": "000001.SH",
+        "shenzhen": "399001.SZ",
+        "chuangye": "399006.SZ",
+        "sh50": "000016.SH",
+        "zz500": "000905.SH",
+        "zz1000": "000852.SH"
+    },
+    "market_indices": {
+        "shanghai": "000001.SH",
+        "shenzhen": "399001.SZ"
+    },
+    "hot_concepts_top_n": 10,
+    "hot_industries_top_n": 10,
+    "ai_analysis": {
+        "enabled": false,
+        "provider": "openai",
+        "api_key": "",
+        "model": "gpt-4o",
+        "base_url": "",
+        "timeout": 60
+    }
+}

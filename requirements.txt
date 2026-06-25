@@ -1,0 +1,3 @@
+# 核心依赖
+# 本项目通过 Wind MCP Skill 的 Node CLI 获取数据，不依赖 pandas/requests
+# 运行时仅使用 Python 标准库
