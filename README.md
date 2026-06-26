@@ -1,6 +1,28 @@
 # a-share-briefing-skill
 
-A 股收盘简报生成 Skill，支持 Agent 模式和独立运行模式。
+![Python](https://img.shields.io/badge/python-3.10+-blue)
+![A-Share](https://img.shields.io/badge/A--Share-market-red)
+![Wind API](https://img.shields.io/badge/data-Wind%20API-orange)
+![Mermaid](https://img.shields.io/badge/charts-Mermaid-green)
+![AI Agent](https://img.shields.io/badge/mode-AI%20Agent%20%2F%20LLM-purple)
+
+> 通用的 A 股收盘简报 Skill：Wind 数据 + AI Agent/LLM 双模式分析，输出含 Mermaid 图表的 Markdown 报告。
+
+## 简介
+
+`a-share-briefing-skill` 是一个面向 A 股市场（stock market）的收盘简报生成工具，通过 Wind API 获取指定交易日数据，输出结构化的 Markdown 报告。报告内置 Mermaid 图表，涵盖大盘概况、行业表现、资金流向、市场广度（market analysis）等核心维度。
+
+支持两种运行模式：
+- **Agent 模式（推荐）**：脚本仅负责数据获取与报告骨架生成，定性分析由 AI Agent（Trae、Claude Code、Codex 等）自行撰写，无需配置外部 LLM。
+- **独立模式**：配置 OpenAI 兼容 API，脚本自动调用 LLM 生成完整报告。
+
+## Features
+
+- **零核心依赖**：仅使用 Python 标准库，开箱即用
+- **双模式架构**：Agent 模式 / LLM 模式 自由切换
+- **Wind API 数据**：指数 / 行业 / 概念 / 资金流向 / 周边市场全覆盖
+- **Mermaid 可视化**：柱状图、对比图、结构图自动生成
+- **跨 Agent 兼容**：支持 Trae / Claude Code / Codex / OpenClaw / Antigravity
 
 ## 依赖
 
