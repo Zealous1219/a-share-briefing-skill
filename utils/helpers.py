@@ -22,9 +22,10 @@ def format_date(date_str: str) -> str:
 
 
 def format_number(num: float) -> str:
-    if num >= 100000000:
+    abs_num = abs(num)
+    if abs_num >= 100000000:
         return f"{num/100000000:.2f}亿"
-    elif num >= 10000:
+    elif abs_num >= 10000:
         return f"{num/10000:.2f}万"
     return f"{num:.2f}"
 

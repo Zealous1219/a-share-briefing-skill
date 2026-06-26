@@ -1,6 +1,7 @@
 import subprocess
 import json
 import os
+import time
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
 
@@ -17,53 +18,72 @@ class WindClient:
         except Exception:
             raise EnvironmentError("未找到 Node.js，请先安装 Node.js")
 
-    def _call_cli(self, server_type: str, tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    def _call_cli(self, server_type: str, tool_name: str, params: Dict[str, Any], retries: int = 2) -> Dict[str, Any]:
         params_json = json.dumps(params, ensure_ascii=False)
-        
+
         cmd = [
             "node", self.cli_path,
             "call", server_type, tool_name,
             params_json
         ]
-        
-        try:
-            result = subprocess.run(
-                cmd,
-                cwd=self.skill_dir,
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                timeout=60
-            )
-            
-            if result.returncode == 0:
-                try:
-                    output = json.loads(result.stdout)
-                    if "content" in output and output["content"]:
-                        content = output["content"][0]
-                        if "text" in content:
-                            try:
-                                inner_data = json.loads(content["text"])
-                                if "data" in inner_data:
-                                    return inner_data["data"]
-                                return inner_data
-                            except json.JSONDecodeError:
-                                return {"text": content["text"]}
-                        return content
-                    return output
-                except json.JSONDecodeError:
-                    return {"text": result.stdout.strip()}
-            else:
-                try:
-                    error = json.loads(result.stderr)
+
+        last_error = None
+        for attempt in range(retries + 1):
+            try:
+                result = subprocess.run(
+                    cmd,
+                    cwd=self.skill_dir,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=60
+                )
+
+                if result.returncode == 0:
+                    try:
+                        output = json.loads(result.stdout)
+                        if "content" in output and output["content"]:
+                            content = output["content"][0]
+                            if "text" in content:
+                                try:
+                                    inner_data = json.loads(content["text"])
+                                    if "data" in inner_data:
+                                        return inner_data["data"]
+                                    return inner_data
+                                except json.JSONDecodeError:
+                                    return {"text": content["text"]}
+                            return content
+                        return output
+                    except json.JSONDecodeError:
+                        return {"text": result.stdout.strip()}
+                else:
+                    # 进程崩溃（如 UV_HANDLE_CLOSING），记录错误并重试
+                    try:
+                        error = json.loads(result.stderr)
+                    except json.JSONDecodeError:
+                        error = {"message": result.stderr.strip()}
+                    last_error = error
+                    if attempt < retries:
+                        time.sleep(1)
+                        continue
                     return {"error": error}
-                except json.JSONDecodeError:
-                    return {"error": {"message": result.stderr.strip()}}
-                    
-        except subprocess.TimeoutExpired:
-            return {"error": {"message": "请求超时"}}
-        except Exception as e:
-            return {"error": {"message": str(e)}}
+
+            except subprocess.TimeoutExpired:
+                last_error = {"message": "请求超时"}
+                if attempt < retries:
+                    time.sleep(1)
+                    continue
+                return {"error": last_error}
+            except Exception as e:
+                last_error = {"message": str(e)}
+                if attempt < retries:
+                    time.sleep(1)
+                    continue
+                return {"error": last_error}
+
+        return {"error": last_error or {"message": "未知错误"}}
+
+
 
     def get_index_price(self, windcode: str, indexes: str) -> Dict[str, Any]:
         return self._call_cli(
@@ -195,7 +215,7 @@ class WindClient:
         return self.get_financial_data(question)
 
     def get_money_flow(self, date: str) -> Dict[str, Any]:
-        question = f"{date}A股资金流向包括主力资金净流入、行业资金净流入排名"
+        question = f"{date} 申万一级行业主力资金净流入排名"
         return self.get_financial_data(question)
 
     def get_market_breadth(self, date: str) -> Dict[str, Any]:

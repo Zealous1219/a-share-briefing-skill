@@ -287,25 +287,31 @@ def _parse_concepts_from_text(text: str) -> List[Dict]:
 def parse_money_flow(money_flow_data: Dict) -> Dict:
     parsed = parse_wind_data(money_flow_data)
 
-    # Wind 返回的数值单位为"元"，无需转换
+    # Wind 返回行业资金净流入，单位为"亿元"，需 ×1e8 转元以匹配下游 format_number/判断逻辑
     result = {"net_inflow": 0, "sector_flow": [], "raw_text": str(money_flow_data), "parsed_success": False}
 
     if "rows" in parsed:
         total_inflow = 0
         found_any = False
         for row in parsed["rows"]:
+            sector_name = ""
+            net_inflow_val = 0
+            has_inflow = False
             for key, val in row.items():
-                if "净流入" in key or "inflow" in key.lower():
+                # 定位行业名：Wind 返回列名含"简称"或"名称"或"行业"或"板块"
+                if "简称" in key or "名称" in key or "行业" in key or "板块" in key:
+                    if isinstance(val, str) and val:
+                        sector_name = val
+                # 定位净流入额：含"净流入"或"inflow"，但排除"排名"列
+                elif ("净流入" in key or "inflow" in key.lower()) and "排名" not in key and "rank" not in key.lower():
                     if isinstance(val, (int, float)):
-                        total_inflow += val
-                        found_any = True
-                        sector_name = ""
-                        for k, v in row.items():
-                            if "行业" in k or "板块" in k:
-                                sector_name = str(v)
-                                break
-                        if sector_name:
-                            result["sector_flow"].append({"name": sector_name, "net_inflow": val})
+                        net_inflow_val = val * 100_000_000  # 亿 -> 元
+                        has_inflow = True
+            if has_inflow:
+                total_inflow += net_inflow_val
+                found_any = True
+                if sector_name:
+                    result["sector_flow"].append({"name": sector_name, "net_inflow": net_inflow_val})
         result["net_inflow"] = total_inflow
         result["parsed_success"] = found_any
     elif "text" in parsed:
