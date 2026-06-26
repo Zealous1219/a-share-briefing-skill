@@ -17,9 +17,13 @@ config.json
 reports/*
 !reports/.gitkeep
 
+# 测试 fixture（Wind 原始返回，本地保存用于离线调试）
+tests/fixtures/
+
 # IDE
 .vscode/
 .idea/
+.trae/
 *.swp
 *.swo
 
