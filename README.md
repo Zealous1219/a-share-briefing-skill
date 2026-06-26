@@ -24,6 +24,8 @@ cp config.example.json config.json
 
 ## 使用
 
+> **环境提示**：以下命令在 Windows 上用 `python`；WSL/Linux 环境请用 `python3`。
+
 ### Agent 模式（推荐）
 
 Agent 运行脚本获取数据，然后自行撰写分析：

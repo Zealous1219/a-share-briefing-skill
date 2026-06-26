@@ -32,7 +32,7 @@ Agent 收到"生成收盘简报"指令后，执行以下两步：
 
 ```bash
 cd <project-path>
-python main.py -d YYYY-MM-DD --no-ai
+python main.py -d YYYY-MM-DD --no-ai   # WSL/Linux 用 python3
 ```
 
 - `--no-ai` 跳过外部 AI 调用（Agent 自身就是 AI）

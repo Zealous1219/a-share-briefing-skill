@@ -56,7 +56,7 @@ def save_report(content: str, date_str: str) -> str:
 
 def color_pct(pct: float) -> str:
     if pct > 0:
-        return f"**{format_pct(pct)}**"
+        return f"**▲{format_pct(pct)}**"
     elif pct < 0:
-        return f"~~{format_pct(pct)}~~"
+        return f"**▼{abs(pct):.2f}%**"
     return format_pct(pct)
